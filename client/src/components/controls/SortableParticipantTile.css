@@ -1,0 +1,56 @@
+.video-tile-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  cursor: grab;
+}
+
+/* Target LiveKit video elements specifically */
+video.lk-participant-media-video {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  border-radius: 8px !important;
+  background: #000 !important;
+}
+
+/* Target any video element within the wrapper */
+.video-tile-wrapper video {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  border-radius: 8px !important;
+  background: #000 !important;
+}
+
+/* Additional specificity for any video element */
+.video-card video,
+.hide-participant-metadata video {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  border-radius: 8px !important;
+  background: #000 !important;
+}
+
+/* Chat notification pill fade animation */
+@keyframes pillFadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.chat-pill {
+  animation: pillFadeOut 5s ease-out 20s forwards;
+} 

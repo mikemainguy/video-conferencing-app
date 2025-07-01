@@ -1,0 +1,96 @@
+import React from 'react';
+import { Card } from '@mantine/core';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { getTrackReferenceId } from '@livekit/components-core';
+import { TILE_MAX_WIDTH, TILE_MIN_WIDTH, TILE_HEIGHT } from './sharedTileConstants';
+import './SortableParticipantTile.css';
+
+function getParticipantName(participant: any) {
+  if (participant?.metadata) {
+    try {
+      const meta = JSON.parse(participant.metadata);
+      if (meta.name) return meta.name;
+    } catch {}
+  }
+  return participant?.identity || '';
+}
+
+export function SortableParticipantTile({ 
+  trackRef, 
+  children, 
+  isScreenShare = false,
+  hasUnreadMessage = false,
+  participantName = '',
+  messagePreview = ''
+}: { 
+  trackRef: any; 
+  children: React.ReactNode; 
+  isScreenShare?: boolean;
+  hasUnreadMessage?: boolean;
+  participantName?: string;
+  messagePreview?: string;
+}) {
+  const id = getTrackReferenceId(trackRef);
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+
+  return (
+    <Card
+      ref={setNodeRef}
+      w="100%"
+      p={0}
+      style={{
+        flex: '1 1 200px',
+        minWidth: TILE_MIN_WIDTH,
+        maxWidth: TILE_MAX_WIDTH,
+        aspectRatio: '16/9',
+        width: '100%',
+        transition,
+        transform: CSS.Transform.toString(transform),
+        touchAction: 'none',
+        display: 'flex',
+        alignItems: 'stretch',
+        justifyContent: 'center',
+        position: 'relative',
+      }}
+      radius="md"
+      withBorder={false}
+      className="hide-participant-metadata video-card"
+      {...attributes}
+      {...listeners}
+    >
+      {/* Chat notification pill */}
+      {hasUnreadMessage && messagePreview && (
+        <div
+          key={`${participantName}-${messagePreview}`}
+          className="chat-pill"
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            background: '#ff6b6b',
+            color: 'white',
+            padding: '6px 10px',
+            borderRadius: 12,
+            fontSize: 11,
+            fontWeight: 500,
+            zIndex: 10,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+            cursor: 'pointer',
+            maxWidth: 200,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+          title={`New message from ${participantName}: ${messagePreview}`}
+        >
+          💬 {messagePreview}
+        </div>
+      )}
+      
+      <div style={{ width: '100%', height: '100%' }}>
+        {children}
+      </div>
+    </Card>
+  );
+} 
