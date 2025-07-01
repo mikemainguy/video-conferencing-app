@@ -20,31 +20,26 @@ export function ChatControl({
   className,
   style
 }: ChatControlProps) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleChat = () => {
+  const showChatHistory = () => {
     if (disabled) return;
-    
-    const newState = !isOpen;
-    setIsOpen(newState);
-    onToggleChat?.(newState);
+    onToggleChat?.(true);
   };
 
   return (
     <Tooltip 
-      label={isOpen ? 'Close chat' : 'Open chat'}
+      label="Show chat history"
       position="top"
     >
       <Button
         size={size}
         variant={variant}
-        color={isOpen ? 'red' : color}
-        onClick={toggleChat}
+        color={color}
+        onClick={showChatHistory}
         disabled={disabled}
         className={className}
         style={style}
       >
-        {isOpen ? '💬 Close Chat' : '💬 Chat'}
+        💬 Chat History
       </Button>
     </Tooltip>
   );

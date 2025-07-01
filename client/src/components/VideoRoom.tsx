@@ -49,7 +49,7 @@ function VideoRoomContent({ roomName, disconnectFromRoom }: { roomName: string; 
         </Alert>
       )}
       
-      <CustomVideoConference onLeaveRoom={disconnectFromRoom}/>
+      <CustomVideoConference onLeaveRoom={disconnectFromRoom} roomName={roomName}/>
     </Stack>
   );
 }

@@ -1,7 +1,10 @@
 import React, { useMemo, useEffect } from 'react';
 import { useTracks, ParticipantTile, useRoomContext } from '@livekit/components-react';
 import { Track } from 'livekit-client';
-import { Paper, Text, SimpleGrid, Card, TextInput, Button as MantineButton, Flex } from '@mantine/core';
+import { Paper, Flex } from '@mantine/core';
+import { chatApi } from '../utils/chatApi';
+import type { ChatMessage } from '../utils/chatApi';
+import { ChatHistoryModal } from './controls/ChatHistoryModal';
 import {
   DndContext,
   closestCenter,
@@ -13,10 +16,8 @@ import {
 import {
   arrayMove,
   SortableContext,
-  useSortable,
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { getTrackReferenceId } from '@livekit/components-core';
 import './CustomVideoConference.css';
 import { ControlBar } from './controls/ControlBar';
@@ -33,20 +34,44 @@ function getParticipantName(participant: any) {
   return participant?.identity || '';
 }
 
-export function CustomVideoConference({ onLeaveRoom }: { onLeaveRoom?: () => void }) {
+export function CustomVideoConference({ onLeaveRoom, roomName }: { onLeaveRoom?: () => void; roomName?: string }) {
   const tracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare]);
   const [order, setOrder] = React.useState<string[]>(() => tracks.map(getTrackReferenceId));
-  const [showChat, setShowChat] = React.useState(false);
+  const [showChat, setShowChat] = React.useState(true); // Always visible
   const [chatMessage, setChatMessage] = React.useState('');
-  const [chatMessages, setChatMessages] = React.useState<{
-    sender: string; 
-    message: string; 
-    timestamp: number; 
-    color: string;
-  }[]>([]);
+  const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
   const [unreadParticipants, setUnreadParticipants] = React.useState<Set<string>>(new Set());
   const [latestMessages, setLatestMessages] = React.useState<Map<string, string>>(new Map());
+  const [isLoadingHistory, setIsLoadingHistory] = React.useState(false);
+  const [showChatHistory, setShowChatHistory] = React.useState(false);
   const room = useRoomContext();
+
+
+
+  // Load chat history when component mounts
+  React.useEffect(() => {
+    if (roomName && room) {
+      setIsLoadingHistory(true);
+      chatApi.getMessages(roomName)
+        .then((messages) => {
+          setChatMessages(messages);
+          // Update latest messages for notification pills
+          const latestMap = new Map<string, string>();
+          messages.forEach((msg) => {
+            if (msg.sender !== 'You') {
+              latestMap.set(msg.sender, msg.message);
+            }
+          });
+          setLatestMessages(latestMap);
+        })
+        .catch((error) => {
+          console.error('Failed to load chat history:', error);
+        })
+        .finally(() => {
+          setIsLoadingHistory(false);
+        });
+    }
+  }, [roomName, room]);
 
   // Listen for incoming chat messages
   React.useEffect(() => {
@@ -56,7 +81,7 @@ export function CustomVideoConference({ onLeaveRoom }: { onLeaveRoom?: () => voi
         const msg = JSON.parse(new TextDecoder().decode(payload));
         if (msg.type === 'chat' && msg.message) {
           const senderName = participant?.name || participant?.identity || 'Unknown';
-          const messageData = {
+          const messageData: ChatMessage = {
             sender: senderName,
             message: msg.message,
             timestamp: msg.timestamp || Date.now(),
@@ -70,6 +95,17 @@ export function CustomVideoConference({ onLeaveRoom }: { onLeaveRoom?: () => voi
           
           // Always add to unread participants
           setUnreadParticipants(prev => new Set(prev).add(senderName));
+          
+          // Store message in history if roomName is available
+          if (roomName) {
+            chatApi.storeMessage(roomName, {
+              sender: senderName,
+              message: msg.message,
+              color: msg.color || '#228be6'
+            }).catch((error) => {
+              console.error('Failed to store incoming message:', error);
+            });
+          }
         }
       } catch {}
     };
@@ -78,6 +114,22 @@ export function CustomVideoConference({ onLeaveRoom }: { onLeaveRoom?: () => voi
       room.off('dataReceived', handleData);
     };
   }, [room, showChat]);
+
+  // Clear chat history
+  const clearChatHistory = async () => {
+    if (!roomName) return;
+    
+    try {
+      const success = await chatApi.clearMessages(roomName);
+      if (success) {
+        setChatMessages([]);
+        setLatestMessages(new Map());
+        setUnreadParticipants(new Set());
+      }
+    } catch (error) {
+      console.error('Failed to clear chat history:', error);
+    }
+  };
 
   // Send chat message
   const sendChatMessage = async () => {
@@ -96,13 +148,26 @@ export function CustomVideoConference({ onLeaveRoom }: { onLeaveRoom?: () => voi
         { reliable: true }
       );
       
-      setChatMessages((prev) => [...prev, { 
+      const newMessage: ChatMessage = {
         sender: 'You', 
         message: chatMessage,
         timestamp: messageData.timestamp,
         color: messageData.color
-      }]);
+      };
+      
+      setChatMessages((prev) => [...prev, newMessage]);
       setChatMessage('');
+      
+      // Store message in history if roomName is available
+      if (roomName) {
+        chatApi.storeMessage(roomName, {
+          sender: 'You',
+          message: chatMessage,
+          color: messageData.color
+        }).catch((error) => {
+          console.error('Failed to store message:', error);
+        });
+      }
     } catch (err) {
       alert('Failed to send message');
     }
@@ -151,48 +216,60 @@ export function CustomVideoConference({ onLeaveRoom }: { onLeaveRoom?: () => voi
     }
   };
 
-  const orderedCameraTracks = useMemo(
-    () => order.map(id => cameraTracks.find(t => getTrackReferenceId(t) === id)).filter(Boolean),
-    [order, cameraTracks]
-  );
-
   // Update order if camera tracks change (e.g., participant joins/leaves)
   useEffect(() => {
     setOrder(cameraTracks.map(getTrackReferenceId));
   }, [cameraTracks.length, cameraTracks]);
 
   return (
-    <Paper p="md" withBorder shadow="md" style={{ background: '#f8fafc', width: '100%', height: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
-      {/* Custom Control Bar with chat toggle */}
+    <div style={{ width: '100%', height: '100%' }}>
+      <Paper p="md" withBorder shadow="md" style={{ background: '#f8fafc', width: '100%', height: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
+      {/* Custom Control Bar with chat history modal toggle */}
       <ControlBar
         showCamera={true}
         showMicrophone={true}
         showScreenShare={true}
-        showChat={true}
+        showChat={false}
         showSettings={true}
         showLeaveRoom={true}
-        onToggleChat={setShowChat}
+        onToggleChat={() => setShowChatHistory(true)}
         onLeaveRoom={onLeaveRoom}
         size="xs"
       />
       
-      {/* Chat Panel */}
-      {showChat && (
-        <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
-          <ChatPanel
-            chatMessage={chatMessage}
-            setChatMessage={setChatMessage}
-            sendChatMessage={sendChatMessage}
-          />
-        </div>
-      )}
+      {/* Chat Panel - Always Visible */}
+      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
+        <ChatPanel
+          chatMessage={chatMessage}
+          setChatMessage={setChatMessage}
+          sendChatMessage={sendChatMessage}
+        />
+      </div>
       
       {/* Screen share row */}
       {screenShareTracks.length > 0 && (
-        <div style={{ display: 'flex', gap: 16, marginBottom: 32, justifyContent: 'center', flexWrap: 'wrap', width: '100%' }}>
+        <div style={{ 
+          display: 'flex', 
+          gap: 16, 
+          marginBottom: 32, 
+          justifyContent: 'center', 
+          flexWrap: 'wrap', 
+          width: '80vw',
+          maxWidth: '80vw',
+          margin: '0 auto 32px auto'
+        }}>
           {screenShareTracks.map((trackRef) =>
             trackRef ? (
-              <SortableParticipantTile key={getTrackReferenceId(trackRef)} trackRef={trackRef} isScreenShare={true}>
+              <SortableParticipantTile 
+                key={getTrackReferenceId(trackRef)} 
+                trackRef={trackRef} 
+                isScreenShare={true}
+                style={{ 
+                  width: '100%', 
+                  maxWidth: '80vw',
+                  aspectRatio: '16/9'
+                }}
+              >
                 <ParticipantTile trackRef={trackRef} />
               </SortableParticipantTile>
             ) : null
@@ -221,5 +298,16 @@ export function CustomVideoConference({ onLeaveRoom }: { onLeaveRoom?: () => voi
         </SortableContext>
       </DndContext>
     </Paper>
+    
+    {/* Chat History Modal */}
+    <ChatHistoryModal
+      opened={showChatHistory}
+      onClose={() => setShowChatHistory(false)}
+      messages={chatMessages}
+      isLoadingHistory={isLoadingHistory}
+      onClearChat={clearChatHistory}
+      roomName={roomName}
+    />
+  </div>
   );
 } 

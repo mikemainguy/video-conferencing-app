@@ -22,7 +22,8 @@ export function SortableParticipantTile({
   isScreenShare = false,
   hasUnreadMessage = false,
   participantName = '',
-  messagePreview = ''
+  messagePreview = '',
+  style
 }: { 
   trackRef: any; 
   children: React.ReactNode; 
@@ -30,6 +31,7 @@ export function SortableParticipantTile({
   hasUnreadMessage?: boolean;
   participantName?: string;
   messagePreview?: string;
+  style?: React.CSSProperties;
 }) {
   const id = getTrackReferenceId(trackRef);
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
@@ -52,6 +54,7 @@ export function SortableParticipantTile({
         alignItems: 'stretch',
         justifyContent: 'center',
         position: 'relative',
+        ...style
       }}
       radius="md"
       withBorder={false}
