@@ -1,5 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config();
 console.log('SESSION_SECRET', process.env.SESSION_SECRET);
 import express from 'express';
 import fs from 'fs';
@@ -41,6 +39,15 @@ app.get('/auth/google/callback', passport.authenticate('google', { failureRedire
     res.redirect('/');
   }
 );
+
+// Facebook OAuth routes
+app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRedirect: '/' }),
+  (req, res) => {
+    res.redirect('/');
+  }
+);
+
 app.get('/auth/logout', (req, res) => {
   req.logout(() => {
     res.redirect('/');

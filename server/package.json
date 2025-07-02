@@ -12,7 +12,8 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "livekit-server-sdk": "^2.13.1"
+    "livekit-server-sdk": "^2.13.1",
+    "passport-facebook": "^3.0.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.5.2",
