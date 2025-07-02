@@ -1,14 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import {
   LiveKitRoom,
   useTracks,
-  useLocalParticipant,
 } from '@livekit/components-react';
-import {CustomVideoConference} from './CustomVideoConference';
+// import {CustomVideoConference} from './CustomVideoConference';
+const CustomVideoConference = lazy(() => import('./CustomVideoConference'));
 import { Room, RoomEvent, Track } from 'livekit-client';
-import { Button, Center, Container, Text, Stack, Group, Paper, Alert, Collapse } from '@mantine/core';
-import { ControlBar } from './controls';
-import { DeviceTest } from './controls/DeviceTest';
+import { Button, Center, Container, Text, Stack, Group, Paper } from '@mantine/core';
 
 interface VideoRoomProps {
   serverUrl: string;
@@ -19,44 +17,19 @@ interface VideoRoomProps {
 
 // Wrapper component to handle room context
 function VideoRoomContent({ roomName, disconnectFromRoom }: { roomName: string; disconnectFromRoom: () => void }) {
-  const { localParticipant } = useLocalParticipant();
-  const [showDebug, setShowDebug] = useState(false);
-  const [permissionError, setPermissionError] = useState<string | null>(null);
-
   return (
     <Stack gap="md">
       <Group justify="space-between" align="center">
         <Text fw={500}>Room: {roomName}</Text>
-        {/* Debug button hidden */}
-        {/* <Button 
-          size="xs" 
-          variant="subtle" 
-          onClick={() => setShowDebug(!showDebug)}
-        >
-          {showDebug ? 'Hide Debug' : 'Show Debug'}
-        </Button> */}
       </Group>
-      
-      {/* Debug panel hidden */}
-      {/* <Collapse in={showDebug}>
-        <DeviceTest localParticipant={localParticipant} />
-      </Collapse> */}
-      
-      {permissionError && (
-        <Alert color="yellow" title="Permission Warning">
-          <Text size="sm">{permissionError}</Text>
-          <Text size="xs" c="dimmed" mt="xs">
-            You can still use the controls to try enabling them again.
-          </Text>
-        </Alert>
-      )}
-      
-      <CustomVideoConference onLeaveRoom={disconnectFromRoom} roomName={roomName}/>
+      <Suspense fallback={<div>Loading conference...</div>}>
+        <CustomVideoConference onLeaveRoom={disconnectFromRoom} roomName={roomName}/>
+      </Suspense>
     </Stack>
   );
 }
 
-export function VideoRoom({ serverUrl, token, roomName = 'default-room', onLeaveRoom }: VideoRoomProps) {
+const VideoRoom = ({ serverUrl, token, roomName = 'default-room', onLeaveRoom }: VideoRoomProps) => {
   const [room, setRoom] = useState<Room | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
@@ -227,7 +200,9 @@ export function VideoRoom({ serverUrl, token, roomName = 'default-room', onLeave
         )}
     </div>
   );
-}
+};
+
+export default VideoRoom;
 
 // Hook to get all video tracks from participants
 export function useVideoTracks() {

@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "version:info": "echo \"App: $npm_package_name, Version: $npm_package_version\"",
-    "build:with-version": "echo \"Building version $npm_package_version\" && npm run build"
+    "build:with-version": "echo \"Building version $npm_package_version\" && npm run build",
+    "dev:server": "npm run dev --workspace=server"
   },
   "dependencies": {
     "@livekit/components-react": "^2.9.12",
@@ -19,6 +20,7 @@
     "@mantine/hooks": "^8.1.2",
     "@mantine/modals": "^8.1.2",
     "@mantine/notifications": "^8.1.2",
+    "@tabler/icons-react": "^3.34.0",
     "dayjs": "^1.11.13",
     "livekit-client": "^2.14.0",
     "react": "^19.1.0",
@@ -33,6 +35,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.2.0",
+    "rollup-plugin-visualizer": "^6.0.3",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.34.1",
     "vite": "^7.0.0"

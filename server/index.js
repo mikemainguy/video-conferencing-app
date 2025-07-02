@@ -1,12 +1,19 @@
+import dotenv from 'dotenv';
+dotenv.config();
+console.log('SESSION_SECRET', process.env.SESSION_SECRET);
 import express from 'express';
 import fs from 'fs';
 import https from 'https';
+import session from 'express-session';
+import passport from './auth.js';
 
 import { config, validateConfig } from './config.js';
 import { corsMiddleware } from './middleware/cors.js';
 import { setupViteMiddleware, setupClientRoutes } from './middleware/vite.js';
 import apiRoutes from './routes/api.js';
 import { logServerStart } from './utils/logger.js';
+
+
 
 const app = express();
 
@@ -16,6 +23,29 @@ validateConfig();
 // Middleware
 app.use(corsMiddleware);
 app.use(express.json());
+
+// Session and Passport setup
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your_secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false } // Set to true if using HTTPS in production
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Google OAuth routes
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+app.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/' }),
+  (req, res) => {
+    res.redirect('/');
+  }
+);
+app.get('/auth/logout', (req, res) => {
+  req.logout(() => {
+    res.redirect('/');
+  });
+});
 
 // Setup Vite middleware for development
 await setupViteMiddleware(app);

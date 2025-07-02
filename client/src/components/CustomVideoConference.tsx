@@ -1,10 +1,9 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect, lazy, Suspense } from 'react';
 import { useTracks, ParticipantTile, useRoomContext } from '@livekit/components-react';
 import { Track } from 'livekit-client';
-import { Paper, Flex } from '@mantine/core';
+import { Paper, Flex, Box, Group, Center, Loader } from '@mantine/core';
 import { chatApi } from '../utils/chatApi';
 import type { ChatMessage } from '../utils/chatApi';
-import { ChatHistoryModal } from './controls/ChatHistoryModal';
 import {
   DndContext,
   closestCenter,
@@ -24,6 +23,8 @@ import { ControlBar } from './controls/ControlBar';
 import { SortableParticipantTile } from './controls/SortableParticipantTile';
 import { ChatPanel } from './controls/ChatPanel';
 
+const ChatHistoryModal = lazy(() => import('./controls/ChatHistoryModal'));
+
 function getParticipantName(participant: any) {
   if (participant?.metadata) {
     try {
@@ -34,10 +35,10 @@ function getParticipantName(participant: any) {
   return participant?.identity || '';
 }
 
-export function CustomVideoConference({ onLeaveRoom, roomName }: { onLeaveRoom?: () => void; roomName?: string }) {
+const CustomVideoConference = ({ onLeaveRoom, roomName }: { onLeaveRoom?: () => void; roomName?: string }) => {
   const tracks = useTracks([Track.Source.Camera, Track.Source.ScreenShare]);
   const [order, setOrder] = React.useState<string[]>(() => tracks.map(getTrackReferenceId));
-  const [showChat, setShowChat] = React.useState(true); // Always visible
+  const [showChat] = React.useState(true); // Always visible
   const [chatMessage, setChatMessage] = React.useState('');
   const [chatMessages, setChatMessages] = React.useState<ChatMessage[]>([]);
   const [unreadParticipants, setUnreadParticipants] = React.useState<Set<string>>(new Set());
@@ -45,8 +46,6 @@ export function CustomVideoConference({ onLeaveRoom, roomName }: { onLeaveRoom?:
   const [isLoadingHistory, setIsLoadingHistory] = React.useState(false);
   const [showChatHistory, setShowChatHistory] = React.useState(false);
   const room = useRoomContext();
-
-
 
   // Load chat history when component mounts
   React.useEffect(() => {
@@ -222,7 +221,7 @@ export function CustomVideoConference({ onLeaveRoom, roomName }: { onLeaveRoom?:
   }, [cameraTracks.length, cameraTracks]);
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <Box w="100%" h="100%">
       <Paper 
         p="md" 
         withBorder 
@@ -230,97 +229,88 @@ export function CustomVideoConference({ onLeaveRoom, roomName }: { onLeaveRoom?:
         className="custom-video-conference"
         style={{ background: '#f8fafc', width: '100%', height: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}
       >
-      {/* Custom Control Bar with chat history modal toggle */}
-      <ControlBar
-        showCamera={true}
-        showMicrophone={true}
-        showScreenShare={true}
-        showChat={false}
-        showSettings={true}
-        showLeaveRoom={true}
-        onToggleChat={() => setShowChatHistory(true)}
-        onLeaveRoom={onLeaveRoom}
-        size="xs"
-      />
-      
-      {/* Chat Panel - Always Visible */}
-      <div className="chat-panel" style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
-        <ChatPanel
-          chatMessage={chatMessage}
-          setChatMessage={setChatMessage}
-          sendChatMessage={sendChatMessage}
+        {/* Custom Control Bar with chat history modal toggle */}
+        <ControlBar
+          showCamera={true}
+          showMicrophone={true}
+          showScreenShare={true}
+          showChat={false}
+          showSettings={true}
+          showLeaveRoom={true}
+          onToggleChat={() => setShowChatHistory(true)}
+          onLeaveRoom={onLeaveRoom}
+          size="xs"
         />
-      </div>
-      
-      {/* Screen share row */}
-      {screenShareTracks.length > 0 && (
-        <div className="screen-share-container" style={{ 
-          display: 'flex', 
-          gap: 16, 
-          marginBottom: 32, 
-          justifyContent: 'center', 
-          flexWrap: 'wrap', 
-          width: '80vw',
-          maxWidth: '80vw',
-          margin: '0 auto 32px auto'
-        }}>
-          {screenShareTracks.map((trackRef) =>
-            trackRef ? (
-              <SortableParticipantTile 
-                key={getTrackReferenceId(trackRef)} 
-                trackRef={trackRef} 
-                isScreenShare={true}
-                style={{ 
-                  width: '100%', 
-                  maxWidth: '80vw',
-                  aspectRatio: '16/9'
-                }}
-              >
-                <ParticipantTile trackRef={trackRef} />
-              </SortableParticipantTile>
-            ) : null
-          )}
-        </div>
-      )}
-      {/* Camera grid */}
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={order} strategy={rectSortingStrategy}>
-          <Flex 
-            wrap="wrap" 
-            gap="md" 
-            justify="center" 
-            align="flex-start" 
-            className="video-grid"
-            style={{ flex: 1, width: '100%', minHeight: 0, overflow: 'auto' }}
-          >
-            {order.map((id) => {
-              const trackRef = tracks.find((t) => getTrackReferenceId(t) === id);
-              return trackRef ? (
+        {/* Chat Panel - Always Visible */}
+        <Group className="chat-panel" mb={16} justify="center">
+          <ChatPanel
+            chatMessage={chatMessage}
+            setChatMessage={setChatMessage}
+            sendChatMessage={sendChatMessage}
+          />
+        </Group>
+        {/* Screen share row */}
+        {screenShareTracks.length > 0 && (
+          <Flex className="screen-share-container" gap={16} mb={32} justify="center" wrap="wrap" w="80vw" maw="80vw" mx="auto">
+            {screenShareTracks.map((trackRef) =>
+              trackRef ? (
                 <SortableParticipantTile 
-                  key={id} 
-                  trackRef={trackRef}
-                  hasUnreadMessage={hasUnreadMessages(trackRef)}
-                  participantName={getParticipantNameFromTrack(trackRef)}
-                  messagePreview={getMessagePreview(trackRef)}
+                  key={getTrackReferenceId(trackRef)} 
+                  trackRef={trackRef} 
+                  style={{ 
+                    width: '100%', 
+                    maxWidth: '80vw',
+                    aspectRatio: '16/9'
+                  }}
                 >
                   <ParticipantTile trackRef={trackRef} />
                 </SortableParticipantTile>
-              ) : null;
-            })}
+              ) : null
+            )}
           </Flex>
-        </SortableContext>
-      </DndContext>
-    </Paper>
-    
-    {/* Chat History Modal */}
-    <ChatHistoryModal
-      opened={showChatHistory}
-      onClose={() => setShowChatHistory(false)}
-      messages={chatMessages}
-      isLoadingHistory={isLoadingHistory}
-      onClearChat={clearChatHistory}
-      roomName={roomName}
-    />
-  </div>
+        )}
+        {/* Camera grid */}
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={order} strategy={rectSortingStrategy}>
+            <Flex 
+              wrap="wrap" 
+              gap="md" 
+              justify="center" 
+              align="flex-start" 
+              className="video-grid"
+              style={{ flex: 1, width: '100%', minHeight: 0, overflow: 'auto' }}
+            >
+              {order.map((id) => {
+                const trackRef = tracks.find((t) => getTrackReferenceId(t) === id);
+                return trackRef ? (
+                  <SortableParticipantTile 
+                    key={id} 
+                    trackRef={trackRef}
+                    hasUnreadMessage={hasUnreadMessages(trackRef)}
+                    participantName={getParticipantNameFromTrack(trackRef)}
+                    messagePreview={getMessagePreview(trackRef)}
+                  >
+                    <ParticipantTile trackRef={trackRef} />
+                  </SortableParticipantTile>
+                ) : null;
+              })}
+            </Flex>
+          </SortableContext>
+        </DndContext>
+      </Paper>
+      {/* Chat History Modal */}
+      <Suspense fallback={<Center><Loader size="md" /></Center>}>
+        <ChatHistoryModal
+          opened={showChatHistory}
+          onClose={() => setShowChatHistory(false)}
+          messages={chatMessages}
+          isLoadingHistory={isLoadingHistory}
+          onClearChat={clearChatHistory}
+          roomName={roomName}
+        />
+      </Suspense>
+    </Box>
   );
-} 
+};
+
+export default CustomVideoConference; 

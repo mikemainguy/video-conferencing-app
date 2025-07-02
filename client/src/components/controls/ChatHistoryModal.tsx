@@ -11,17 +11,15 @@ interface ChatHistoryModalProps {
   roomName?: string;
 }
 
-export function ChatHistoryModal({
+const ChatHistoryModal = ({
   opened,
   onClose,
   messages,
   isLoadingHistory = false,
   onClearChat,
   roomName
-}: ChatHistoryModalProps) {
+}: ChatHistoryModalProps) => {
   const scrollAreaRef = React.useRef<HTMLDivElement>(null);
-
-
 
   const formatTime = (timestamp: number) => {
     return new Date(timestamp).toLocaleTimeString([], { 
@@ -120,4 +118,6 @@ export function ChatHistoryModal({
       </div>
     </Modal>
   );
-} 
+};
+
+export default ChatHistoryModal; 

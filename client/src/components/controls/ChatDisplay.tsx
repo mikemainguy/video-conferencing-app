@@ -1,4 +1,3 @@
-import React from 'react';
 import { Paper, Text, ScrollArea } from '@mantine/core';
 
 interface ChatMessage {

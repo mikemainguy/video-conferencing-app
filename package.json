@@ -10,12 +10,13 @@
   "scripts": {
     "dev": "npm run dev --workspace=server",
     "dev:separate": "concurrently \"npm run dev --workspace=client\" \"npm run dev --workspace=server\"",
-    "build": "npm run build --workspaces",
+    "build": "npm run build --workspace=client",
     "test": "npm run test --workspaces",
     "lint": "npm run lint --workspaces",
     "clean": "npm run clean --workspaces",
     "install:all": "npm install && npm install --workspaces",
-    "version:all": "npm version --workspaces"
+    "version:all": "npm version --workspaces",
+    "start": "npm run build --workspace=client && npm run start --workspace=server"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
@@ -25,11 +26,13 @@
   "engines": {
     "node": ">=22.0.0"
   },
-
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
-    "@dnd-kit/utilities": "^3.2.2"
+    "@dnd-kit/utilities": "^3.2.2",
+    "express-session": "^1.18.1",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0"
   },
   "overrides": {
     "glob": "^10.0.0"

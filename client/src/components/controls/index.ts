@@ -3,7 +3,7 @@ export { CameraControl } from './CameraControl';
 export { MicrophoneControl } from './MicrophoneControl';
 export { ScreenShareControl } from './ScreenShareControl';
 export { ChatControl } from './ChatControl';
-export { ChatHistoryModal } from './ChatHistoryModal';
+export { default as ChatHistoryModal } from './ChatHistoryModal';
 export { ChatPanel } from './ChatPanel';
 export { SettingsControl } from './SettingsControl';
 export { LeaveRoomControl } from './LeaveRoomControl';

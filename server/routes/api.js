@@ -6,11 +6,15 @@ const router = express.Router();
 
 // POST /api/token { identity, room, name }
 router.post('/token', async (req, res) => {
+  // Require authentication
+  if (!req.isAuthenticated || !req.isAuthenticated() || !req.user) {
+    return res.status(401).json({ error: 'Not authenticated' });
+  }
   const { identity, room, name } = req.body;
   
   try {
     const token = await generateToken(identity, room, name);
-    res.json({ token });
+    res.json({ token, user: req.user });
   } catch (err) {
     console.error('Failed to generate token:', err);
     res.status(400).json({ error: err.message });
@@ -56,6 +60,15 @@ router.delete('/messages/:roomName', (req, res) => {
     res.json({ success: true, message: 'Chat history cleared' });
   } catch (err) {
     res.status(400).json({ error: err.message });
+  }
+});
+
+// GET /api/me - Return authenticated user info or 401
+router.get('/me', (req, res) => {
+  if (req.isAuthenticated && req.isAuthenticated() && req.user) {
+    res.json({ user: req.user });
+  } else {
+    res.status(401).json({ error: 'Not authenticated' });
   }
 });
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { TextInput, Button as MantineButton, Group } from '@mantine/core';
 
 interface ChatPanelProps {

@@ -2,24 +2,12 @@ import React from 'react';
 import { Card } from '@mantine/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { getTrackReferenceId } from '@livekit/components-core';
-import { TILE_MAX_WIDTH, TILE_MIN_WIDTH, TILE_HEIGHT } from './sharedTileConstants';
+import { TILE_MAX_WIDTH, TILE_MIN_WIDTH } from './sharedTileConstants';
 import './SortableParticipantTile.css';
-
-function getParticipantName(participant: any) {
-  if (participant?.metadata) {
-    try {
-      const meta = JSON.parse(participant.metadata);
-      if (meta.name) return meta.name;
-    } catch {}
-  }
-  return participant?.identity || '';
-}
 
 export function SortableParticipantTile({ 
   trackRef, 
   children, 
-  isScreenShare = false,
   hasUnreadMessage = false,
   participantName = '',
   messagePreview = '',
@@ -27,13 +15,12 @@ export function SortableParticipantTile({
 }: { 
   trackRef: any; 
   children: React.ReactNode; 
-  isScreenShare?: boolean;
   hasUnreadMessage?: boolean;
   participantName?: string;
   messagePreview?: string;
   style?: React.CSSProperties;
 }) {
-  const id = getTrackReferenceId(trackRef);
+  const id = trackRef?.id || trackRef?.publication?.trackSid || String(Math.random());
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
 
   return (

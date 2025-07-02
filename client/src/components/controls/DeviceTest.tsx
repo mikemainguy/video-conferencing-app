@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, Stack, Text, Paper, Group, Alert } from '@mantine/core';
 
 interface DeviceTestProps {

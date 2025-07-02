@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { Container, TextInput, Button, Stack, Paper, Text, Alert, Group } from '@mantine/core';
-import { VideoRoom } from './VideoRoom';
+import { useState, useEffect, lazy, Suspense } from 'react';
+import { Container, TextInput, Button, Stack, Paper } from '@mantine/core';
+// import { VideoRoom } from './VideoRoom';
+const VideoRoom = lazy(() => import('./VideoRoom'));
 
 // Check for required environment variables
 const LIVEKIT_URL = import.meta.env.VITE_LIVEKIT_URL;
@@ -15,12 +16,26 @@ if (!TOKEN_ENDPOINT) {
 }
 console.log(TOKEN_ENDPOINT);
 export function VideoRoomLobby() {
-  const [serverUrl, setServerUrl] = useState(LIVEKIT_URL || '');
   const [token, setToken] = useState('');
   const [roomName, setRoomName] = useState('demo-room');
   const [userName, setUserName] = useState('');
   const [isGeneratingToken, setIsGeneratingToken] = useState(false);
   const [readyToJoin, setReadyToJoin] = useState(false);
+
+  // Set userName from authentication provider if available
+  useEffect(() => {
+    if (!userName) {
+      fetch('/api/me', { credentials: 'include' })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          if (data && data.user) {
+            // Google profile: displayName, Facebook: displayName or name
+            setUserName(data.user.displayName || data.user.name || '');
+          }
+        })
+        .catch(() => {});
+    }
+  }, [userName]);
 
   const joinRoom = async () => {
     if (!roomName) {
@@ -62,11 +77,6 @@ export function VideoRoomLobby() {
     }
   };
 
-  const handleBackToSetup = () => {
-    setReadyToJoin(false);
-    setToken('');
-  };
-
   // Handler to reset state when leaving the room
   const handleLeaveRoom = () => {
     setReadyToJoin(false);
@@ -77,12 +87,14 @@ export function VideoRoomLobby() {
     <Container py="xl">
       {readyToJoin && token && roomName && userName ? (
         <Stack gap="md">
-          <VideoRoom 
-            serverUrl={serverUrl}
-            token={token}
-            roomName={roomName}
-            onLeaveRoom={handleLeaveRoom}
-          />
+          <Suspense fallback={<div>Loading video room...</div>}>
+            <VideoRoom 
+              serverUrl={LIVEKIT_URL}
+              token={token}
+              roomName={roomName}
+              onLeaveRoom={handleLeaveRoom}
+            />
+          </Suspense>
         </Stack>
       ) : (
         <Paper p="xl" withBorder>
