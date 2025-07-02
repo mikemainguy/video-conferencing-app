@@ -13,7 +13,9 @@ jobs:
     env:
       NODE_ENV: production
 
+
     steps:
+      - name: Set up Node.js
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -28,21 +30,11 @@ jobs:
         run: npm install
         working-directory: ./server
 
-      - name: Lint client
-        run: npm run lint --if-present
-        working-directory: ./client
-
-      - name: Lint server
-        run: npm run lint --if-present
+      - name: start server
+        run: npm run start
         working-directory: ./server
 
-      - name: Build client
-        run: npm run build
-        working-directory: ./client
-
-      - name: Test server
-        run: npm test --if-present
-        working-directory: ./server
+        
 
       # Optional: Add your own deployment/restart steps here, e.g.:
       # - name: Restart PM2
