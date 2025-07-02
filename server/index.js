@@ -48,6 +48,14 @@ app.get('/auth/facebook/callback', passport.authenticate('facebook', { failureRe
   }
 );
 
+// LinkedIn OAuth routes
+app.get('/auth/linkedin', passport.authenticate('linkedin'));
+app.get('/auth/linkedin/callback', passport.authenticate('linkedin', { failureRedirect: '/' }),
+  (req, res) => {
+    res.redirect('/');
+  }
+);
+
 app.get('/auth/logout', (req, res) => {
   req.logout(() => {
     res.redirect('/');

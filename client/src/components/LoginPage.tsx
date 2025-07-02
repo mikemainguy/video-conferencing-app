@@ -1,5 +1,5 @@
 import { Center, Paper, Stack, Title, Button, Group } from '@mantine/core';
-import { IconBrandGoogle, IconBrandFacebook } from '@tabler/icons-react';
+import { IconBrandGoogle, IconBrandFacebook, IconBrandLinkedin } from '@tabler/icons-react';
 
 export default function LoginPage() {
   return (
@@ -27,6 +27,16 @@ export default function LoginPage() {
               size="md"
             >
               Login with Facebook
+            </Button>
+            <Button
+              component="a"
+              href="/auth/linkedin"
+              leftSection={<IconBrandLinkedin size={18} />}
+              color="cyan"
+              variant="outline"
+              size="md"
+            >
+              Login with LinkedIn
             </Button>
           </Group>
         </Stack>
