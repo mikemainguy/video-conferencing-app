@@ -7,7 +7,9 @@
     "dev": "vite --host",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "version:info": "echo \"App: $npm_package_name, Version: $npm_package_version\"",
+    "build:with-version": "echo \"Building version $npm_package_version\" && npm run build"
   },
   "dependencies": {
     "@livekit/components-react": "^2.9.12",

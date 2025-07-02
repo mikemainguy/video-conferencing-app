@@ -27,18 +27,20 @@ function VideoRoomContent({ roomName, disconnectFromRoom }: { roomName: string; 
     <Stack gap="md">
       <Group justify="space-between" align="center">
         <Text fw={500}>Room: {roomName}</Text>
-        <Button 
+        {/* Debug button hidden */}
+        {/* <Button 
           size="xs" 
           variant="subtle" 
           onClick={() => setShowDebug(!showDebug)}
         >
           {showDebug ? 'Hide Debug' : 'Show Debug'}
-        </Button>
+        </Button> */}
       </Group>
       
-      <Collapse in={showDebug}>
+      {/* Debug panel hidden */}
+      {/* <Collapse in={showDebug}>
         <DeviceTest localParticipant={localParticipant} />
-      </Collapse>
+      </Collapse> */}
       
       {permissionError && (
         <Alert color="yellow" title="Permission Warning">

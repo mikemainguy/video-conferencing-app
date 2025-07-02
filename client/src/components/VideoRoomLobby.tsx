@@ -75,7 +75,7 @@ export function VideoRoomLobby() {
 
   return (
     <Container py="xl">
-      {readyToJoin && token && serverUrl && roomName && userName ? (
+      {readyToJoin && token && roomName && userName ? (
         <Stack gap="md">
           <VideoRoom 
             serverUrl={serverUrl}
@@ -99,18 +99,19 @@ export function VideoRoomLobby() {
             <Button 
               onClick={joinRoom}
               loading={isGeneratingToken}
-              disabled={!serverUrl || !roomName || !userName}
+              disabled={!roomName || !userName}
               size="md"
             >
               Join
             </Button>
-            <TextInput
+            {/* LiveKit Server URL input hidden - using environment variable */}
+            {/* <TextInput
               label="LiveKit Server URL"
               placeholder="ws://localhost:7880"
               value={serverUrl}
               onChange={(e) => setServerUrl(e.target.value)}
               description="Your LiveKit server WebSocket URL (default: ws://localhost:7880)"
-            />
+            /> */}
 
             <TextInput
               label="Room Name"

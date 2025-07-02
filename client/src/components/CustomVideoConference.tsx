@@ -223,7 +223,13 @@ export function CustomVideoConference({ onLeaveRoom, roomName }: { onLeaveRoom?:
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
-      <Paper p="md" withBorder shadow="md" style={{ background: '#f8fafc', width: '100%', height: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
+      <Paper 
+        p="md" 
+        withBorder 
+        shadow="md" 
+        className="custom-video-conference"
+        style={{ background: '#f8fafc', width: '100%', height: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}
+      >
       {/* Custom Control Bar with chat history modal toggle */}
       <ControlBar
         showCamera={true}
@@ -238,7 +244,7 @@ export function CustomVideoConference({ onLeaveRoom, roomName }: { onLeaveRoom?:
       />
       
       {/* Chat Panel - Always Visible */}
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
+      <div className="chat-panel" style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
         <ChatPanel
           chatMessage={chatMessage}
           setChatMessage={setChatMessage}
@@ -248,7 +254,7 @@ export function CustomVideoConference({ onLeaveRoom, roomName }: { onLeaveRoom?:
       
       {/* Screen share row */}
       {screenShareTracks.length > 0 && (
-        <div style={{ 
+        <div className="screen-share-container" style={{ 
           display: 'flex', 
           gap: 16, 
           marginBottom: 32, 
@@ -279,7 +285,14 @@ export function CustomVideoConference({ onLeaveRoom, roomName }: { onLeaveRoom?:
       {/* Camera grid */}
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={order} strategy={rectSortingStrategy}>
-          <Flex wrap="wrap" gap="md" justify="center" align="flex-start" style={{ flex: 1, width: '100%', minHeight: 0, overflow: 'auto' }}>
+          <Flex 
+            wrap="wrap" 
+            gap="md" 
+            justify="center" 
+            align="flex-start" 
+            className="video-grid"
+            style={{ flex: 1, width: '100%', minHeight: 0, overflow: 'auto' }}
+          >
             {order.map((id) => {
               const trackRef = tracks.find((t) => getTrackReferenceId(t) === id);
               return trackRef ? (

@@ -35,4 +35,122 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  /* Main container adjustments */
+  .custom-video-conference {
+    padding: 8px !important;
+    height: 100vh !important;
+    overflow: hidden;
+  }
+
+  /* Control bar mobile optimization */
+  .control-bar {
+    padding: 8px !important;
+    gap: 4px !important;
+  }
+
+  .control-bar button {
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+    min-width: auto !important;
+  }
+
+  /* Chat panel mobile optimization */
+  .chat-panel {
+    margin-bottom: 8px !important;
+    padding: 0 8px !important;
+  }
+
+  .chat-panel input {
+    font-size: 14px !important;
+    padding: 8px !important;
+  }
+
+  .chat-panel button {
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+  }
+
+  /* Screen share mobile optimization */
+  .screen-share-container {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 0 auto 16px auto !important;
+  }
+
+  /* Video grid mobile optimization */
+  .video-grid {
+    gap: 4px !important;
+    padding: 0 4px !important;
+  }
+
+  /* Video tiles mobile optimization */
+  .video-tile {
+    min-width: 120px !important;
+    max-width: calc(50vw - 8px) !important;
+    aspect-ratio: 16/9 !important;
+  }
+
+  /* Hide participant metadata on mobile */
+  .hide-participant-metadata [class*='participant-metadata'],
+  .hide-participant-metadata [class*='participant-name'],
+  .hide-participant-metadata [class*='metadata'],
+  .hide-participant-metadata [class*='name'] {
+    display: none !important;
+  }
+
+  /* Chat notification pills mobile optimization */
+  .chat-pill {
+    font-size: 10px !important;
+    padding: 4px 6px !important;
+    max-width: 120px !important;
+    right: 4px !important;
+    top: 4px !important;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .video-tile {
+    min-width: 100px !important;
+    max-width: calc(50vw - 4px) !important;
+  }
+
+  .control-bar button {
+    padding: 4px 6px !important;
+    font-size: 11px !important;
+  }
+
+  .chat-panel input {
+    font-size: 13px !important;
+    padding: 6px !important;
+  }
+
+  .screen-share-container {
+    width: 98vw !important;
+    max-width: 98vw !important;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .custom-video-conference {
+    padding: 4px !important;
+  }
+
+  .video-grid {
+    gap: 2px !important;
+  }
+
+  .video-tile {
+    min-width: 100px !important;
+    max-width: calc(33.33vw - 4px) !important;
+  }
+
+  .control-bar {
+    padding: 4px !important;
+  }
 } 
