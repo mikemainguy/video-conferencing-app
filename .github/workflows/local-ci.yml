@@ -1,0 +1,49 @@
+name: Local CI
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: [self-hosted]
+
+    env:
+      NODE_ENV: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install root dependencies
+        run: npm install
+
+      - name: Install client dependencies
+        run: npm install
+        working-directory: ./client
+
+      - name: Install server dependencies
+        run: npm install
+        working-directory: ./server
+
+      - name: Lint client
+        run: npm run lint --if-present
+        working-directory: ./client
+
+      - name: Lint server
+        run: npm run lint --if-present
+        working-directory: ./server
+
+      - name: Build client
+        run: npm run build
+        working-directory: ./client
+
+      - name: Test server
+        run: npm test --if-present
+        working-directory: ./server
+
+      # Optional: Add your own deployment/restart steps here, e.g.:
+      # - name: Restart PM2
+      #   run: pm2 reload server/index.js --name video-app || pm2 start server/index.js --name video-app 
