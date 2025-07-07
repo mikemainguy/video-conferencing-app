@@ -9,6 +9,6 @@ export default defineConfig({
     visualizer({ open: true })
   ],
   server: {
-    allowedHosts: ['localhost', '192.168.17.2', 'video.dasfad.com'],
+    allowedHosts: ['localhost', '192.168.17.2', 'video.dasfad.com', 'video.aardvark.guru'],
   },
 })
