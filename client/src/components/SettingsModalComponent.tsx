@@ -1,20 +1,20 @@
-import React from 'react';
 import { Modal, Title } from '@mantine/core';
 
 interface SettingsModalProps {
-  opened: boolean;
+  isOpened: boolean;
   onClose: () => void;
 }
 
-export function SettingsModal({ opened, onClose }: SettingsModalProps) {
+export function SettingsModal({ isOpened, onClose }: SettingsModalProps) {
   return (
     <Modal
-      opened={opened}
+      opened={isOpened}
       onClose={onClose}
+      centered={true}
       title={<Title order={3}>Settings</Title>}
       size="md"
     >
-      {/* Modal content will be added later */}
+      ABC
     </Modal>
   );
 }

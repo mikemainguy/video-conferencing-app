@@ -1,5 +1,4 @@
-import React from 'react';
-import { TextInput, Button, Stack, Paper } from '@mantine/core';
+import { TextInput, Button, Stack, Paper, Center } from '@mantine/core';
 
 interface UserInfoFormProps {
   userName: string;
@@ -19,7 +18,7 @@ export function UserInfoForm({
   onJoinRoom
 }: UserInfoFormProps) {
   return (
-    <Paper p="xl" withBorder>
+    <Center><Paper w="50%" m="xl" p="xl" withBorder>
       <Stack gap="lg">
         <TextInput
           label="Your Name"
@@ -46,5 +45,6 @@ export function UserInfoForm({
         </Button>
       </Stack>
     </Paper>
+    </Center>
   );
 }

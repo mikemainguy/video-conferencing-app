@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Tooltip } from '@mantine/core';
-import { SettingsModal } from '../path/to/SettingsModal'; // Adjust the import path as needed
+import {SettingsModal} from "./SettingsModalComponent.tsx";
+
 
 interface SettingsControlProps {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
