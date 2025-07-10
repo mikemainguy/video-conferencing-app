@@ -1,7 +1,7 @@
 import React, { useMemo, useEffect, lazy, Suspense } from 'react';
-import { useTracks, ParticipantTile, useRoomContext } from '@livekit/components-react';
+import {useTracks, useRoomContext} from '@livekit/components-react';
 import { Track } from 'livekit-client';
-import { Paper, Flex, Box, Group, Center, Loader } from '@mantine/core';
+import { Paper, Flex, Group, Center, Loader } from '@mantine/core';
 import { chatApi } from '../utils/chatApi';
 import type { ChatMessage } from '../utils/chatApi';
 import {
@@ -221,13 +221,10 @@ const CustomVideoConference = ({ onLeaveRoom, roomName }: { onLeaveRoom?: () => 
   }, [cameraTracks.length, cameraTracks]);
 
   return (
-    <Box w="100%" h="100%">
-      <Paper 
+    <>      <Paper
         p="md" 
         withBorder 
-        shadow="md" 
-        className="custom-video-conference"
-        style={{ background: '#f8fafc', width: '100%', height: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}
+        shadow="md"
       >
         {/* Custom Control Bar with chat history modal toggle */}
         <ControlBar
@@ -251,20 +248,14 @@ const CustomVideoConference = ({ onLeaveRoom, roomName }: { onLeaveRoom?: () => 
         </Group>
         {/* Screen share row */}
         {screenShareTracks.length > 0 && (
-          <Flex className="screen-share-container" gap={16} mb={32} justify="center" wrap="wrap" w="80vw" maw="80vw" mx="auto">
+          <Flex>
             {screenShareTracks.map((trackRef) =>
               trackRef ? (
-                <SortableParticipantTile 
-                  key={getTrackReferenceId(trackRef)} 
-                  trackRef={trackRef} 
-                  style={{ 
-                    width: '100%', 
-                    maxWidth: '80vw',
-                    aspectRatio: '16/9'
-                  }}
-                >
-                  <ParticipantTile trackRef={trackRef} />
-                </SortableParticipantTile>
+                <SortableParticipantTile
+                  key={getTrackReferenceId(trackRef)}
+                  trackRef={trackRef}
+                  w="100%"
+                />
               ) : null
             )}
           </Flex>
@@ -276,9 +267,7 @@ const CustomVideoConference = ({ onLeaveRoom, roomName }: { onLeaveRoom?: () => 
               wrap="wrap" 
               gap="md" 
               justify="center" 
-              align="flex-start" 
-              className="video-grid"
-              style={{ flex: 1, width: '100%', minHeight: 0, overflow: 'auto' }}
+              align="flex-start"
             >
               {order.map((id) => {
                 const trackRef = tracks.find((t) => getTrackReferenceId(t) === id);
@@ -286,12 +275,12 @@ const CustomVideoConference = ({ onLeaveRoom, roomName }: { onLeaveRoom?: () => 
                   <SortableParticipantTile 
                     key={id} 
                     trackRef={trackRef}
+                    w="20%"
                     hasUnreadMessage={hasUnreadMessages(trackRef)}
                     participantName={getParticipantNameFromTrack(trackRef)}
                     messagePreview={getMessagePreview(trackRef)}
-                  >
-                    <ParticipantTile trackRef={trackRef} />
-                  </SortableParticipantTile>
+                  />
+
                 ) : null;
               })}
             </Flex>
@@ -309,7 +298,7 @@ const CustomVideoConference = ({ onLeaveRoom, roomName }: { onLeaveRoom?: () => 
           roomName={roomName}
         />
       </Suspense>
-    </Box>
+    </>
   );
 };
 
