@@ -1,5 +1,7 @@
 import { Center, Paper, Stack, Title, Button, Group } from '@mantine/core';
-import { IconBrandGoogle, IconBrandFacebook, IconBrandLinkedin } from '@tabler/icons-react';
+import IconBrandGoogle from '@tabler/icons-react/dist/esm/icons/IconBrandGoogle';
+import IconBrandFacebook from '@tabler/icons-react/dist/esm/icons/IconBrandFacebook';
+import IconBrandLinkedin from '@tabler/icons-react/dist/esm/icons/IconBrandLinkedin';
 
 export default function LoginPage() {
   return (

@@ -23,18 +23,20 @@ export async function setupViteMiddleware(app) {
 export function setupClientRoutes(app) {
   if (config.isProduction) {
     console.log('Serving static files in production mode');
-    // In production, serve built files from /client/dist
-    app.use(express.static(config.client.distPath));
 
     // Only serve index.html for routes that don't look like static assets
     app.use('*', (req, res, next) => {
-      const path = req.originalUrl;
+
+      const urlPath = req.originalUrl;
       // Skip asset files with extensions like .js, .css, .png, etc.
-      if (/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/.test(path)) {
+      if (/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/.test(urlPath)) {
+        console.log(urlPath);
         return next();
       }
-      res.sendFile(path.resolve(config.client.distPath, 'index.html'));
+      console.log(path.resolve('./dist/public', 'index.html'));
+      res.sendFile(path.resolve('./dist/public', 'index.html'));
     });
+    app.use('/assets', express.static('./dist/public/assets'));
   } else {
     // Fallback: serve index.html for all other routes (for React Router)
     app.use('*', async (req, res, next) => {

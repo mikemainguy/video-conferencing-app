@@ -1,7 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { Container, TextInput, Button, Stack, Paper } from '@mantine/core';
-// import { VideoRoom } from './VideoRoom';
+import { Stack } from '@mantine/core';
 const VideoRoom = lazy(() => import('./VideoRoom'));
+import { UserInfoForm } from './UserInfoForm';
 
 // Check for required environment variables
 const LIVEKIT_URL = import.meta.env.VITE_LIVEKIT_URL;
@@ -26,14 +26,14 @@ export function VideoRoomLobby() {
   useEffect(() => {
     if (!userName) {
       fetch('/api/me', { credentials: 'include' })
-        .then(res => res.ok ? res.json() : null)
-        .then(data => {
-          if (data && data.user) {
-            // Google profile: displayName, Facebook: displayName or name
-            setUserName(data.user.displayName || data.user.name || '');
-          }
-        })
-        .catch(() => {});
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            if (data && data.user) {
+              // Google profile: displayName, Facebook: displayName or name
+              setUserName(data.user.displayName || data.user.name || '');
+            }
+          })
+          .catch(() => {});
     }
   }, [userName]);
 
@@ -84,60 +84,28 @@ export function VideoRoomLobby() {
   };
 
   return (
-    <Container py="xl">
-      {readyToJoin && token && roomName && userName ? (
-        <Stack gap="md">
-          <Suspense fallback={<div>Loading video room...</div>}>
-            <VideoRoom 
-              serverUrl={LIVEKIT_URL}
-              token={token}
-              roomName={roomName}
-              onLeaveRoom={handleLeaveRoom}
+      <>
+        {readyToJoin && token && roomName && userName ? (
+            <Stack gap="md">
+              <Suspense fallback={<div>Loading video room...</div>}>
+                <VideoRoom
+                    serverUrl={LIVEKIT_URL}
+                    token={token}
+                    roomName={roomName}
+                    onLeaveRoom={handleLeaveRoom}
+                />
+              </Suspense>
+            </Stack>
+        ) : (
+            <UserInfoForm
+                userName={userName}
+                roomName={roomName}
+                isGeneratingToken={isGeneratingToken}
+                onUserNameChange={setUserName}
+                onRoomNameChange={setRoomName}
+                onJoinRoom={joinRoom}
             />
-          </Suspense>
-        </Stack>
-      ) : (
-        <Paper p="xl" withBorder>
-          <Stack gap="lg">
-          
-            <TextInput
-              label="Your Name"
-              placeholder="Enter your name"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              description="This will be your display name in the room"
-              required
-            />
-            <Button 
-              onClick={joinRoom}
-              loading={isGeneratingToken}
-              disabled={!roomName || !userName}
-              size="md"
-            >
-              Join
-            </Button>
-            {/* LiveKit Server URL input hidden - using environment variable */}
-            {/* <TextInput
-              label="LiveKit Server URL"
-              placeholder="ws://localhost:7880"
-              value={serverUrl}
-              onChange={(e) => setServerUrl(e.target.value)}
-              description="Your LiveKit server WebSocket URL (default: ws://localhost:7880)"
-            /> */}
-
-            <TextInput
-              label="Room Name"
-              placeholder="demo-room"
-              value={roomName}
-              onChange={(e) => setRoomName(e.target.value)}
-              description="Name of the room to join"
-            />
-
-
-
-          </Stack>
-        </Paper>
-      )}
-    </Container>
+        )}
+      </>
   );
-} 
+}

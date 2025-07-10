@@ -176,16 +176,7 @@ const VideoRoom = ({ serverUrl, token, roomName = 'default-room', onLeaveRoom }:
   }
 
   return (
-    <div
-      style={{
-        width: '100vw',
-        height: '100vh',
-        boxSizing: 'border-box',
-        padding: 16,
-        background: '#f8fafc',
-        overflow: 'hidden',
-      }}
-    >
+    <>
         {room && (
           <LiveKitRoom
             room={room}
@@ -198,7 +189,7 @@ const VideoRoom = ({ serverUrl, token, roomName = 'default-room', onLeaveRoom }:
           <VideoRoomContent roomName={roomName} disconnectFromRoom={disconnectFromRoom} />
           </LiveKitRoom>
         )}
-    </div>
+    </>
   );
 };
 

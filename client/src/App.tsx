@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Container, Loader, Center } from '@mantine/core';
+import { Loader, Center } from '@mantine/core';
 import { VideoRoomLobby } from './components/VideoRoomLobby';
 import LoginPage from './components/LoginPage';
 
@@ -30,9 +30,9 @@ function App() {
   }
 
   return (
-    <Container>
+
       <VideoRoomLobby />
-    </Container>
+
   );
 }
 
